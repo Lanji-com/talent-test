@@ -35,7 +35,7 @@ button:active { background: #357abd; }
 <div id="app">
   <div id="start" class="page">
     <h1>多元智能八大天赋测试</h1>
-    <p>本测试共120题，请根据你的第一反应选择。没有对错之分。</p>
+    <p>本测试共120题，请根据你的第一反应选择，没有对错之分。</p>
     <p>预计需要5-10分钟。</p>
     <button onclick="startTest()">开始测试</button>
   </div>
@@ -161,7 +161,6 @@ function showQuestion() {
 
 function selectOption(optIdx) {
   const q = isAddPhase ? addShuffled[addCurrentIndex] : shuffled[currentIndex];
-  const labels = isAddPhase ? optionLabels.slice(0, 4) : optionLabels;
   const scores = isAddPhase ? optionScores.slice(0, 4) : optionScores;
   
   if (isAddPhase) {
@@ -275,5 +274,7 @@ function showResult() {
     let adviceText = "";
     if (level === 'high') adviceText = "你的这项天赋非常突出，建议你在生活和工作中多寻找能发挥这项优势的场景，这会让你获得极大的成就感和满足感。";
     else if (level === 'mid') adviceText = "你的这项天赋处于中等水平，建议在需要时可以有意识地运用它，同时结合其他更突出的天赋，形成组合优势。";
-    else adviceText = "这项天赋相对偏弱，无需焦虑。你可以尝试在遇到相关问题时，借助工具、团队或刻意练习来弥补，而不必强求自己变
-    
+    else adviceText = "这项天赋相对偏弱，无需焦虑。你可以尝试在遇到相关问题时，借助工具、团队或刻意练习来弥补，而不必强求自己变成这方面的高手。";
+
+    reportHTML += `<div class="report-box">
+      <h3>🏆 第 ${idx + 1} 名：${r.c}天赋（${r.percent}%）</h
