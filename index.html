@@ -3,30 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>多元智能八大天赋测试</title>
+<title>多元智能八大天赋测试（高级版）</title>
 <style>
 * { box-sizing: border-box; }
 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 0; background: #f5f7fa; color: #333; }
 .page { max-width: 600px; margin: 0 auto; padding: 20px; }
 h1 { font-size: 22px; text-align: center; margin: 20px 0; }
-p { line-height: 1.6; }
+h2 { font-size: 18px; margin-top: 30px; }
+p { line-height: 1.6; font-size: 15px; color: #444; }
 button { display: block; width: 100%; padding: 14px; margin: 10px 0; font-size: 16px; border: none; border-radius: 10px; background: #4a90d9; color: #fff; cursor: pointer; }
 button:active { background: #357abd; }
 .progress { text-align: center; color: #666; margin-bottom: 10px; font-size: 14px; }
 .question { font-size: 18px; font-weight: 500; margin: 20px 0; min-height: 80px; line-height: 1.5; }
-.option-btn { background: #fff; color: #333; border: 1px solid #ddd; margin: 8px 0; text-align: left; padding: 14px; }
+.option-btn { background: #fff; color: #333; border: 1px solid #ddd; margin: 8px 0; text-align: left; padding: 14px; font-size: 15px; }
 .option-btn:active { background: #e8f0fe; border-color: #4a90d9; }
 .option-btn.selected { background: #e8f0fe; border-color: #4a90d9; font-weight: bold; }
-.score-item { margin: 15px 0; }
-.score-label { font-size: 14px; margin-bottom: 4px; }
-.score-bar { height: 12px; background: #e0e0e0; border-radius: 6px; overflow: hidden; }
-.score-fill { height: 100%; background: #4a90d9; border-radius: 6px; transition: width 0.5s; }
-.score-text { font-size: 12px; color: #666; margin-top: 2px; text-align: right; }
-#top3 { margin-top: 30px; padding: 15px; background: #fff; border-radius: 10px; }
-#top3 h2 { font-size: 18px; margin-top: 0; }
-.note { font-size: 12px; color: #999; margin-top: 15px; }
+.score-item { margin: 18px 0; }
+.score-label { font-size: 15px; font-weight: 500; margin-bottom: 5px; }
+.score-bar { height: 14px; background: #e0e0e0; border-radius: 7px; overflow: hidden; }
+.score-fill { height: 100%; background: linear-gradient(90deg, #4a90d9, #6ab0f3); border-radius: 7px; transition: width 0.6s ease; }
+.score-text { font-size: 13px; color: #666; margin-top: 4px; text-align: right; }
+.report-box { background: #fff; border-radius: 12px; padding: 20px; margin-top: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+.report-box h3 { font-size: 17px; color: #2c3e50; margin-top: 0; border-left: 4px solid #4a90d9; padding-left: 10px; }
+.report-box p { font-size: 14px; line-height: 1.7; color: #555; margin: 8px 0; }
 .prev-btn { background: #fff; color: #666; border: 1px solid #ccc; margin-top: 20px; font-size: 14px; }
 .prev-btn:active { background: #f0f0f0; }
+.warning-box { background: #fffbe6; border: 1px solid #ffe58f; padding: 15px; border-radius: 8px; margin: 20px 0; font-size: 14px; line-height: 1.6; }
 </style>
 </head>
 <body>
@@ -34,236 +36,184 @@ button:active { background: #357abd; }
   <div id="start" class="page">
     <h1>多元智能八大天赋测试</h1>
     <p>本测试共120题，请根据你的第一反应选择。没有对错之分。</p>
-    <p>预计需要5-10分钟。</p>
+    <p>预计需要5-10分钟。选择“不确定”不扣分，但选得越多，系统可能会为你增加更细致的补充题。</p>
     <button onclick="startTest()">开始测试</button>
   </div>
+
   <div id="quiz" class="page" style="display:none;">
-    <div class="progress">第 <span id="currentNum">1</span> / 120 题</div>
+    <div class="progress">第 <span id="currentNum">1</span> / <span id="totalNum">120</span> 题</div>
     <div class="question" id="questionText"></div>
     <div class="options" id="options"></div>
     <button class="prev-btn" id="prevBtn" onclick="prevQuestion()" style="display:none;">← 返回上一题</button>
   </div>
+
+  <div id="addPrompt" class="page" style="display:none;">
+    <h1>补充测试邀请</h1>
+    <div class="warning-box" id="addPromptText"></div>
+    <p>回答补充题可以让结果更精准，预计只需2-3分钟。</p>
+    <button onclick="startAddTest()">是的，我要加题</button>
+    <button onclick="skipAddTest()" style="background:#999;">不用了，直接看报告</button>
+  </div>
+
   <div id="result" class="page" style="display:none;">
-    <h1>你的测试结果</h1>
+    <h1>你的专属测试报告</h1>
     <div id="scores"></div>
     <div id="top3"></div>
     <button onclick="location.reload()">重新测试</button>
   </div>
 </div>
 <script>
+const optionLabels = ["非常符合","比较符合","一般","不太符合","完全不符合","不确定"];
+const optionScores = [5,4,3,2,1,0];
+const categories = ["语言","逻辑","空间","动觉","音乐","人际","内省","自然"];
+
 const questions = [
-  // 语言类
-  {t:"听完一件事后，我能比较完整地转述给别人。", c:"语言"},
-  {t:"别人说话时，我会留意他们用词是否准确。", c:"语言"},
-  {t:"看到有趣的句子，我会想记下来或发给别人。", c:"语言"},
-  {t:"我常能用几句话把复杂的事说明白。", c:"语言"},
-  {t:"我会因为一段文字写得好而反复读。", c:"语言"},
-  {t:"玩词语接龙、猜谜这类活动时，我通常比较投入。", c:"语言"},
-  {t:"别人讲错一个词或一句话，我容易听出来。", c:"语言"},
-  {t:"我有时会在心里替别人组织更好的说法。", c:"语言"},
-  {t:"看电影或电视剧时，我会记住一些台词。", c:"语言"},
-  {t:"如果要表达一个想法，我更习惯用文字而不是图。", c:"语言"},
-  {t:"我讲故事时，别人通常愿意听下去。", c:"语言"},
-  {t:"学习新东西时，我容易记住其中的名称和说法。", c:"语言"},
-  {t:"我会注意广告、标题或口号是怎么写的。", c:"语言"},
-  {t:"和别人讨论时，我能较快抓住对方话里的重点。", c:"语言"},
-  {t:"我常会想：这句话换一种说法会不会更好。", c:"语言"},
-  // 逻辑类
-  {t:"遇到排队、打折或分东西时，我会很快算出大概结果。", c:"逻辑"},
-  {t:"看到一串数字或步骤，我会不自觉想找其中的规律。", c:"逻辑"},
-  {t:"做决定前，我习惯先列出条件和可能结果。", c:"逻辑"},
-  {t:"别人说一件事时，我会想它前后是否说得通。", c:"逻辑"},
-  {t:"玩需要策略的游戏时，我会提前想好几步。", c:"逻辑"},
-  {t:"我常会估算时间，判断一件事来不来得及。", c:"逻辑"},
-  {t:"如果两个说法互相矛盾，我比较容易察觉。", c:"逻辑"},
-  {t:"整理东西时，我喜欢按一定规则分类。", c:"逻辑"},
-  {t:"看到图表或数据，我会想知道它说明了什么。", c:"逻辑"},
-  {t:"遇到复杂问题，我会把它拆成几个小问题。", c:"逻辑"},
-  {t:"我常会想“如果这样，那接下来会怎样”。", c:"逻辑"},
-  {t:"我对规则、顺序、步骤比较在意。", c:"逻辑"},
-  {t:"别人给出结论时，我会想有没有证据支持。", c:"逻辑"},
-  {t:"我有时会为了验证一个想法去做小尝试。", c:"逻辑"},
-  {t:"我容易记住一些数字、顺序或操作流程。", c:"逻辑"},
-  // 空间类
-  {t:"去一个新地方后，我能在脑子里大致画出路线。", c:"空间"},
-  {t:"搬动家具前，我会先想象摆好后的样子。", c:"空间"},
-  {t:"看说明书组装东西时，我容易看懂图上的结构。", c:"空间"},
-  {t:"我常注意到别人衣服、房间或页面的颜色搭配。", c:"空间"},
-  {t:"我能根据平面图想象出实际空间的样子。", c:"空间"},
-  {t:"拍照时，我会在意角度和构图。", c:"空间"},
-  {t:"找路时，我常靠地标和方向，而不是只靠文字提示。", c:"空间"},
-  {t:"我有时会在脑中旋转一个物体，想象它从另一面看是什么样。", c:"空间"},
-  {t:"整理笔记时，我喜欢用线条、箭头或框图。", c:"空间"},
-  {t:"看地图时，我比较容易分清位置关系。", c:"空间"},
-  {t:"我能记住看过图片或场景中的许多细节。", c:"空间"},
-  {t:"做手工或拼装时，我容易判断零件该放哪里。", c:"空间"},
-  {t:"我常会用画面来帮助自己理解一件事。", c:"空间"},
-  {t:"房间或桌面的摆放不合适，我会觉得别扭。", c:"空间"},
-  {t:"我能在心里比较两个形状是否一样。", c:"空间"},
-  // 动觉类
-  {t:"学一个新动作时，我通常跟着做几遍就能掌握。", c:"动觉"},
-  {t:"我做事时喜欢边动手边想，而不是只看别人做。", c:"动觉"},
-  {t:"别人示范动作时，我容易模仿得比较像。", c:"动觉"},
-  {t:"长时间坐着不动，我会觉得难受。", c:"动觉"},
-  {t:"我用手操作工具、材料时比较有把握。", c:"动觉"},
-  {t:"走路或上下楼梯时，我很少磕碰。", c:"动觉"},
-  {t:"我常能通过表情和动作让别人明白我的意思。", c:"动觉"},
-  {t:"玩需要身体反应的活动时，我通常跟得上。", c:"动觉"},
-  {t:"遇到需要拆开、组装或修理的东西，我愿意试试。", c:"动觉"},
-  {t:"我对物体的轻重、软硬、温度比较敏感。", c:"动觉"},
-  {t:"我学骑车、游泳或类似技能时，通常上手较快。", c:"动觉"},
-  {t:"我有时会不自觉用动作帮助自己表达。", c:"动觉"},
-  {t:"在集体活动中，我能较快配合别人的动作。", c:"动觉"},
-  {t:"我喜欢通过实际做一遍来记住步骤。", c:"动觉"},
-  {t:"我能记住并重现一段连续动作。", c:"动觉"},
-  // 音乐类
-  {t:"听过几遍的旋律，我常能哼出来。", c:"音乐"},
-  {t:"周围有节奏的声音时，我会不自觉跟着打拍子。", c:"音乐"},
-  {t:"我能听出别人唱歌有没有跑调。", c:"音乐"},
-  {t:"做事时，有声音或音乐陪伴我会更投入。", c:"音乐"},
-  {t:"我能分辨出不同声音的来源或特点。", c:"音乐"},
-  {t:"一段音乐容易让我联想到某种情绪或画面。", c:"音乐"},
-  {t:"我常会记住广告、视频或游戏里的旋律。", c:"音乐"},
-  {t:"学一首新歌时，我通常比背文字更快。", c:"音乐"},
-  {t:"我对环境里的杂音、节奏比较敏感。", c:"音乐"},
-  {t:"说话或朗读时，我会注意语调起伏。", c:"音乐"},
-  {t:"我有时会自己改动熟悉的歌词或旋律。", c:"音乐"},
-  {t:"听到喜欢的节奏，我身体会自然有反应。", c:"音乐"},
-  {t:"我能听出同一首歌不同版本的变化。", c:"音乐"},
-  {t:"我容易记住别人说话的语气和节奏。", c:"音乐"},
-  {t:"安静时，我脑中有时会浮现某段旋律。", c:"音乐"},
-  // 人际类
-  {t:"进入一个新群体时，我通常能较快和人熟起来。", c:"人际"},
-  {t:"别人心情不好时，我常能较早察觉。", c:"人际"},
-  {t:"我常会成为别人愿意倾诉的对象。", c:"人际"},
-  {t:"在小组里，我容易注意到谁被忽略了。", c:"人际"},
-  {t:"和别人意见不合时，我常能找到折中的说法。", c:"人际"},
-  {t:"我能根据对方反应调整自己说话的方式。", c:"人际"},
-  {t:"我常能猜出别人话里没直接说出的意思。", c:"人际"},
-  {t:"集体活动时，我比较愿意协调大家的安排。", c:"人际"},
-  {t:"别人向我求助时，我通常知道怎么回应。", c:"人际"},
-  {t:"我容易记住别人说过的重要事情。", c:"人际"},
-  {t:"在陌生场合，我通常不会太长时间觉得不自在。", c:"人际"},
-  {t:"我常能感觉到一个群体的气氛变化。", c:"人际"},
-  {t:"我有时会主动让场面不那么尴尬。", c:"人际"},
-  {t:"我比较能理解别人为什么那样想。", c:"人际"},
-  {t:"朋友之间发生矛盾时，我常被拉去评理或调解。", c:"人际"},
-  // 内省类
-  {t:"做完重要决定后，我会想自己为什么这样选。", c:"内省"},
-  {t:"我比较清楚自己在什么状态下效率高。", c:"内省"},
-  {t:"我常会回顾自己说过的话是否合适。", c:"内省"},
-  {t:"遇到挫折时，我会先想自己哪里可以调整。", c:"内省"},
-  {t:"我喜欢有一些独处的时间。", c:"内省"},
-  {t:"我常会给自己定一些目标，并默默推进。", c:"内省"},
-  {t:"我能较早察觉自己情绪不对劲。", c:"内省"},
-  {t:"我知道自己真正在意什么。", c:"内省"},
-  {t:"别人夸我或批评我时，我会想是否符合自己。", c:"内省"},
-  {t:"我有时会写下来或记下自己的想法。", c:"内省"},
-  {t:"做选择时，我不太容易被别人完全带偏。", c:"内省"},
-  {t:"我常会想“这到底是不是我想要的”。", c:"内省"},
-  {t:"我能分辨自己是真喜欢，还是只是跟风。", c:"内省"},
-  {t:"我做事前会考虑自己的底线和原则。", c:"内省"},
-  {t:"我有时会停下来整理自己的心情。", c:"内省"},
-  // 自然类
-  {t:"走路时，我会注意到路边植物的变化。", c:"自然"},
-  {t:"我能发现天气、光线或季节的细小变化。", c:"自然"},
-  {t:"看到不认识的动植物，我会想知道它叫什么。", c:"自然"},
-  {t:"我常能注意到别人忽略的环境细节。", c:"自然"},
-  {t:"我喜欢观察云、风、水或星空的形态。", c:"自然"},
-  {t:"我容易分辨出不同植物或动物的特征。", c:"自然"},
-  {t:"我会关心食物从哪里来、干不干净。", c:"自然"},
-  {t:"在户外时，我常会觉得放松和投入。", c:"自然"},
-  {t:"我喜欢把看到的东西按类别整理。", c:"自然"},
-  {t:"我会注意一个地方的环境是否被破坏。", c:"自然"},
-  {t:"看到小动物或昆虫，我常会停下来看一会儿。", c:"自然"},
-  {t:"我能根据一些迹象判断天气会不会变。", c:"自然"},
-  {t:"我喜欢看关于自然、动物或宇宙的内容。", c:"自然"},
-  {t:"我有时会记录或拍下自然中的发现。", c:"自然"},
-  {t:"我常会想某些自然现象是怎么形成的。", c:"自然"}
+  // 语言 (15)
+  {t:"听完一件事后，我能比较完整地转述给别人。",c:"语言"},{t:"别人说话时，我会留意他们用词是否准确。",c:"语言"},{t:"看到有趣的句子，我会想记下来或发给别人。",c:"语言"},{t:"我常能用几句话把复杂的事说明白。",c:"语言"},{t:"我会因为一段文字写得好而反复读。",c:"语言"},{t:"玩词语接龙、猜谜这类活动时，我通常比较投入。",c:"语言"},{t:"别人讲错一个词或一句话，我容易听出来。",c:"语言"},{t:"我有时会在心里替别人组织更好的说法。",c:"语言"},{t:"看电影或电视剧时，我会记住一些台词。",c:"语言"},{t:"如果要表达一个想法，我更习惯用文字而不是图。",c:"语言"},{t:"我讲故事时，别人通常愿意听下去。",c:"语言"},{t:"学习新东西时，我容易记住其中的名称和说法。",c:"语言"},{t:"我会注意广告、标题或口号是怎么写的。",c:"语言"},{t:"和别人讨论时，我能较快抓住对方话里的重点。",c:"语言"},{t:"我常会想：这句话换一种说法会不会更好。",c:"语言"},
+  // 逻辑 (15)
+  {t:"遇到排队、打折或分东西时，我会很快算出大概结果。",c:"逻辑"},{t:"看到一串数字或步骤，我会不自觉想找其中的规律。",c:"逻辑"},{t:"做决定前，我习惯先列出条件和可能结果。",c:"逻辑"},{t:"别人说一件事时，我会想它前后是否说得通。",c:"逻辑"},{t:"玩需要策略的游戏时，我会提前想好几步。",c:"逻辑"},{t:"我常会估算时间，判断一件事来不来得及。",c:"逻辑"},{t:"如果两个说法互相矛盾，我比较容易察觉。",c:"逻辑"},{t:"整理东西时，我喜欢按一定规则分类。",c:"逻辑"},{t:"看到图表或数据，我会想知道它说明了什么。",c:"逻辑"},{t:"遇到复杂问题，我会把它拆成几个小问题。",c:"逻辑"},{t:"我常会想“如果这样，那接下来会怎样”。",c:"逻辑"},{t:"我对规则、顺序、步骤比较在意。",c:"逻辑"},{t:"别人给出结论时，我会想有没有证据支持。",c:"逻辑"},{t:"我有时会为了验证一个想法去做小尝试。",c:"逻辑"},{t:"我容易记住一些数字、顺序或操作流程。",c:"逻辑"},
+  // 空间 (15)
+  {t:"去一个新地方后，我能在脑子里大致画出路线。",c:"空间"},{t:"搬动家具前，我会先想象摆好后的样子。",c:"空间"},{t:"看说明书组装东西时，我容易看懂图上的结构。",c:"空间"},{t:"我常注意到别人衣服、房间或页面的颜色搭配。",c:"空间"},{t:"我能根据平面图想象出实际空间的样子。",c:"空间"},{t:"拍照时，我会在意角度和构图。",c:"空间"},{t:"找路时，我常靠地标和方向，而不是只靠文字提示。",c:"空间"},{t:"我有时会在脑中旋转一个物体，想象它从另一面看是什么样。",c:"空间"},{t:"整理笔记时，我喜欢用线条、箭头或框图。",c:"空间"},{t:"看地图时，我比较容易分清位置关系。",c:"空间"},{t:"我能记住看过图片或场景中的许多细节。",c:"空间"},{t:"做手工或拼装时，我容易判断零件该放哪里。",c:"空间"},{t:"我常会用画面来帮助自己理解一件事。",c:"空间"},{t:"房间或桌面的摆放不合适，我会觉得别扭。",c:"空间"},{t:"我能在心里比较两个形状是否一样。",c:"空间"},
+  // 动觉 (15)
+  {t:"学一个新动作时，我通常跟着做几遍就能掌握。",c:"动觉"},{t:"我做事时喜欢边动手边想，而不是只看别人做。",c:"动觉"},{t:"别人示范动作时，我容易模仿得比较像。",c:"动觉"},{t:"长时间坐着不动，我会觉得难受。",c:"动觉"},{t:"我用手操作工具、材料时比较有把握。",c:"动觉"},{t:"走路或上下楼梯时，我很少磕碰。",c:"动觉"},{t:"我常能通过表情和动作让别人明白我的意思。",c:"动觉"},{t:"玩需要身体反应的活动时，我通常跟得上。",c:"动觉"},{t:"遇到需要拆开、组装或修理的东西，我愿意试试。",c:"动觉"},{t:"我对物体的轻重、软硬、温度比较敏感。",c:"动觉"},{t:"我学骑车、游泳或类似技能时，通常上手较快。",c:"动觉"},{t:"我有时会不自觉用动作帮助自己表达。",c:"动觉"},{t:"在集体活动中，我能较快配合别人的动作。",c:"动觉"},{t:"我喜欢通过实际做一遍来记住步骤。",c:"动觉"},{t:"我能记住并重现一段连续动作。",c:"动觉"},
+  // 音乐 (15)
+  {t:"听过几遍的旋律，我常能哼出来。",c:"音乐"},{t:"周围有节奏的声音时，我会不自觉跟着打拍子。",c:"音乐"},{t:"我能听出别人唱歌有没有跑调。",c:"音乐"},{t:"做事时，有声音或音乐陪伴我会更投入。",c:"音乐"},{t:"我能分辨出不同声音的来源或特点。",c:"音乐"},{t:"一段音乐容易让我联想到某种情绪或画面。",c:"音乐"},{t:"我常会记住广告、视频或游戏里的旋律。",c:"音乐"},{t:"学一首新歌时，我通常比背文字更快。",c:"音乐"},{t:"我对环境里的杂音、节奏比较敏感。",c:"音乐"},{t:"说话或朗读时，我会注意语调起伏。",c:"音乐"},{t:"我有时会自己改动熟悉的歌词或旋律。",c:"音乐"},{t:"听到喜欢的节奏，我身体会自然有反应。",c:"音乐"},{t:"我能听出同一首歌不同版本的变化。",c:"音乐"},{t:"我容易记住别人说话的语气和节奏。",c:"音乐"},{t:"安静时，我脑中有时会浮现某段旋律。",c:"音乐"},
+  // 人际 (15)
+  {t:"进入一个新群体时，我通常能较快和人熟起来。",c:"人际"},{t:"别人心情不好时，我常能较早察觉。",c:"人际"},{t:"我常会成为别人愿意倾诉的对象。",c:"人际"},{t:"在小组里，我容易注意到谁被忽略了。",c:"人际"},{t:"和别人意见不合时，我常能找到折中的说法。",c:"人际"},{t:"我能根据对方反应调整自己说话的方式。",c:"人际"},{t:"我常能猜出别人话里没直接说出的意思。",c:"人际"},{t:"集体活动时，我比较愿意协调大家的安排。",c:"人际"},{t:"别人向我求助时，我通常知道怎么回应。",c:"人际"},{t:"我容易记住别人说过的重要事情。",c:"人际"},{t:"在陌生场合，我通常不会太长时间觉得不自在。",c:"人际"},{t:"我常能感觉到一个群体的气氛变化。",c:"人际"},{t:"我有时会主动让场面不那么尴尬。",c:"人际"},{t:"我比较能理解别人为什么那样想。",c:"人际"},{t:"朋友之间发生矛盾时，我常被拉去评理或调解。",c:"人际"},
+  // 内省 (15)
+  {t:"做完重要决定后，我会想自己为什么这样选。",c:"内省"},{t:"我比较清楚自己在什么状态下效率高。",c:"内省"},{t:"我常会回顾自己说过的话是否合适。",c:"内省"},{t:"遇到挫折时，我会先想自己哪里可以调整。",c:"内省"},{t:"我喜欢有一些独处的时间。",c:"内省"},{t:"我常会给自己定一些目标，并默默推进。",c:"内省"},{t:"我能较早察觉自己情绪不对劲。",c:"内省"},{t:"我知道自己真正在意什么。",c:"内省"},{t:"别人夸我或批评我时，我会想是否符合自己。",c:"内省"},{t:"我有时会写下来或记下自己的想法。",c:"内省"},{t:"做选择时，我不太容易被别人完全带偏。",c:"内省"},{t:"我常会想“这到底是不是我想要的”。",c:"内省"},{t:"我能分辨自己是真喜欢，还是只是跟风。",c:"内省"},{t:"我做事前会考虑自己的底线和原则。",c:"内省"},{t:"我有时会停下来整理自己的心情。",c:"内省"},
+  // 自然 (15)
+  {t:"走路时，我会注意到路边植物的变化。",c:"自然"},{t:"我能发现天气、光线或季节的细小变化。",c:"自然"},{t:"看到不认识的动植物，我会想知道它叫什么。",c:"自然"},{t:"我常能注意到别人忽略的环境细节。",c:"自然"},{t:"我喜欢观察云、风、水或星空的形态。",c:"自然"},{t:"我容易分辨出不同植物或动物的特征。",c:"自然"},{t:"我会关心食物从哪里来、干不干净。",c:"自然"},{t:"在户外时，我常会觉得放松和投入。",c:"自然"},{t:"我喜欢把看到的东西按类别整理。",c:"自然"},{t:"我会注意一个地方的环境是否被破坏。",c:"自然"},{t:"看到小动物或昆虫，我常会停下来看一会儿。",c:"自然"},{t:"我能根据一些迹象判断天气会不会变。",c:"自然"},{t:"我喜欢看关于自然、动物或宇宙的内容。",c:"自然"},{t:"我有时会记录或拍下自然中的发现。",c:"自然"},{t:"我常会想某些自然现象是怎么形成的。",c:"自然"}
 ];
 
-const optionLabels = ["非常符合","比较符合","一般 / 不确定","不太符合","完全不符合"];
-const optionScores = [5,4,3,2,1];
-const categories = ["语言","逻辑","空间","动觉","音乐","人际","内省","自然"];
-let shuffled = [], currentIndex = 0, answers = [];
+const addQuestions = {
+  "语言":[{t:"当你想表达一个复杂想法时，通常能一口气说得很有条理。"},{t:"朋友让你推荐一本书或一部电影，你能讲清楚推荐它的具体理由。"},{t:"工作中遇到争议，你会尝试用书面文字把事情梳理清楚再沟通。"},{t:"你经常能敏锐地发现别人口语表达中用词不当的地方。"},{t:"写一段超过300字的文字，对你来说很容易且不会觉得痛苦。"},{t:"在讨论中，你习惯用讲故事或举例子来支撑自己的观点。"},{t:"你会有意识地收集一些新词汇，并尝试在聊天中运用。"},{t:"别人经常夸奖你的表达逻辑清晰或文笔好。"},{t:"你善于把枯燥的数据或信息，转化成别人容易理解的说法。"},{t:"听完一场讲座，你能迅速抓住核心要点并记录下来。"}],
+  "逻辑":[{t:"在超市排队结账时，你会下意识估算哪一队会更快排到。"},{t:"在玩策略游戏时，你习惯提前规划好几步甚至十几步的走法。"},{t:"看到网上流传的统计图表，你会先怀疑它的数据来源是否可靠。"},{t:"别人跟你争论时，你常能发现对方观点里的逻辑漏洞。"},{t:"遇到复杂问题，你习惯画流程图或列一个条件清单来理清思路。"},{t:"你经常能在生活琐事中总结出一些规律或“小技巧”。"},{t:"做决策前，你习惯把“利”和“弊”分别列出来对比。"},{t:"对于没有明确规则的混乱局面，你会觉得有些不自在。"},{t:"你经常能在不同事物之间发现它们的内在相似性。"},{t:"你能轻易理解说明书上的步骤，并判断出哪一个环节最容易出错。"}],
+  "空间":[{t:"在家里，你能准确说出某件家具的具体尺寸和摆放位置。"},{t:"玩拼图或乐高时，你经常不需要看图纸就能拼出大概形状。"},{t:"如果你去一个陌生的商场，你能迅速在脑中形成一张楼层分布图。"},{t:"拍照时，你非常在意画面中各元素的远近和比例关系。"},{t:"看三维建模图或建筑效果图时，你不会觉得头晕。"},{t:"你习惯用画图或思维导图来辅助自己整理思路。"},{t:"你能根据别人的口头描述，在脑海中清晰浮现出那个场景的画面。"},{t:"当房间家具位置改变时，你会觉得心理上需要重新适应一段时间。"},{t:"你能通过观察一张平面地图，想象出该地区真实的起伏地形。"},{t:"你有时候会发现自己对色彩搭配或空间布局有独特的审美要求。"}],
+  "动觉":[{t:"看到一个新的舞蹈动作或健身操，你能很快模仿个大概。"},{t:"你倾向于通过动手拆卸或组装来研究一个物品的结构。"},{t:"你在打字、写字或使用工具时，通常非常流畅精准。"},{t:"长时间坐着开会或看书，你会感到身体极其难受。"},{t:"你善于用肢体语言或面部表情来辅助表达情绪。"},{t:"在遇到紧急情况时，你的身体反应往往比大脑思考还快。"},{t:"学习一项新运动或手工技能时，你比一般人上手要快。"},{t:"你可以在脑中模拟一个动作，然后身体就能较好地完成它。"},{t:"你非常在意衣服的材质触感以及物品拿在手上的重量感。"},{t:"在团队协作中，你经常能把握好操作实物的节奏和进度。"}],
+  "音乐":[{t:"听到一段旋律，你很容易能分辨出它是大调还是小调（或欢快还是忧伤）。"},{t:"你在走路或做家务时，脑海中经常会自动循环某段旋律。"},{t:"你听音乐时，会不自觉地关注其中的乐器演奏或编曲细节。"},{t:"别人唱歌跑调，会让你感觉非常明显甚至有点难受。"},{t:"你能够轻松记住一首歌的副歌部分并准确哼唱。"},{t:"你对环境中的噪音（例如空调声、水龙头滴水声）非常敏感。"},{t:"你说话或朗读时，节奏感和抑扬顿挫往往把握得比较好。"},{t:"你有时会根据不同的心情，主动挑选适合的音乐来听。"},{t:"学习语言时，你对语调、口音的模仿能力比较强。"},{t:"你会在生活中发现一些别人忽略的有趣声音或节奏。"}],
+  "人际":[{t:"只要进入一个新的社交圈子，你通常能很快叫出几个人的名字。"},{t:"看到朋友情绪低沉，你会立刻停止开玩笑并尝试关心他们。"},{t:"在团队中，你总是能很快察觉到谁对目前的安排有异议。"},{t:"你善于在不同意见的朋友之间周旋，做到不伤和气。"},{t:"别人遇到困难时，会第一时间想到来找你商量或倾诉。"},{t:"你懂得根据对方的身份和性格，调整自己说话的语气。"},{t:"在社交活动中，你经常扮演破冰或调动气氛的角色。"},{t:"你能听出别人话里隐藏的情绪或潜台词。"},{t:"你很少会因为在人群中待太久而感到心理能量完全耗尽。"},{t:"你经常主动去关心那些在群体中显得比较内向边缘的人。"}],
+  "内省":[{t:"你每天都会留出一些时间，独自安静地思考。"},{t:"你清楚地知道自己最擅长的三件事和最不擅长的三件事。"},{t:"在做重要决定前，你会认真权衡这是否符合你的核心价值观。"},{t:"当情绪出现波动时，你通常能很快觉察到原因。"},{t:"你习惯于给自己制定短期和长期的目标。"},{t:"别人夸赞你时，你会思考对方是客套还是真心的。"},{t:"遇到挫折时，你倾向于先反思自己可以改进的地方，而不是抱怨环境。"},{t:"你有时会写下自己的感受或想法，以帮助自己理清思绪。"},{t:"你不容易受到他人观点的影响，有自己独立的判断标准。"},{t:"你经常思考自己到底想要什么样的人生。"}],
+  "自然":[{t:"走在公园里，你会注意到不同植物的叶子形状和颜色差异。"},{t:"你能敏锐察觉到天气即将发生变化（比如空气湿度、风向）。"},{t:"你经常会去观察路边的小动物或昆虫的活动。"},{t:"你了解并能区分至少十种以上常见的植物或动物名称。"},{t:"你非常在意日常生活中的垃圾分类和环保问题。"},{t:"你在户外环境里，比在室内更容易感到放松和愉悦。"},{t:"你习惯把遇到的新事物按照某种类别（如形状、性质）进行分类。"},{t:"看到不认识的植物或动物，你会有查阅资料搞清楚它是什么的冲动。"},{t:"你对自然纪录片、科普读物或环境保护新闻非常感兴趣。"},{t:"你能根据地形、植被或环境特征，判断自己大致处于什么生态区域。"}]
+};
 
-function shuffle(arr) {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
+let shuffled = [], currentIndex = 0, answers = [];
+let isAddPhase = false, addShuffled = [], addCurrentIndex = 0, addAnswers = [];
+let uncertainCounts = {}, triggeredCategories = [];
+
+function shuffle(arr) { for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; }
 
 function startTest() {
   shuffled = shuffle([...questions]);
-  currentIndex = 0;
-  answers = new Array(shuffled.length);
+  currentIndex = 0; answers = new Array(shuffled.length);
+  uncertainCounts = {}; categories.forEach(c => uncertainCounts[c] = 0);
+  isAddPhase = false;
   document.getElementById('start').style.display = 'none';
   document.getElementById('quiz').style.display = 'block';
+  document.getElementById('totalNum').textContent = shuffled.length;
   showQuestion();
 }
 
+function startAddTest() {
+  triggeredCategories = categories.filter(c => uncertainCounts[c] >= 5);
+  addShuffled = [];
+  triggeredCategories.forEach(c => {
+    addQuestions[c].forEach(q => { addShuffled.push({t: q.t, c: c}); });
+  });
+  addShuffled = shuffle(addShuffled);
+  addCurrentIndex = 0; addAnswers = new Array(addShuffled.length);
+  isAddPhase = true;
+  document.getElementById('addPrompt').style.display = 'none';
+  document.getElementById('quiz').style.display = 'block';
+  document.getElementById('totalNum').textContent = addShuffled.length;
+  showQuestion();
+}
+
+function skipAddTest() {
+  document.getElementById('addPrompt').style.display = 'none';
+  showResult();
+}
+
 function showQuestion() {
-  const q = shuffled[currentIndex];
-  document.getElementById('currentNum').textContent = currentIndex + 1;
+  const q = isAddPhase ? addShuffled[addCurrentIndex] : shuffled[currentIndex];
+  document.getElementById('currentNum').textContent = isAddPhase ? addCurrentIndex + 1 : currentIndex + 1;
   document.getElementById('questionText').textContent = q.t;
   
-  // 控制“上一题”按钮的显示
   const prevBtn = document.getElementById('prevBtn');
-  if (currentIndex > 0) {
-    prevBtn.style.display = 'block';
-  } else {
-    prevBtn.style.display = 'none';
-  }
-
+  prevBtn.style.display = (isAddPhase ? addCurrentIndex : currentIndex) > 0 ? 'block' : 'none';
+  
   const optionsDiv = document.getElementById('options');
   optionsDiv.innerHTML = '';
-  optionLabels.forEach((label, idx) => {
+  const labels = isAddPhase ? optionLabels.slice(0, 4) : optionLabels;
+  const scores = isAddPhase ? optionScores.slice(0, 4) : optionScores;
+  const currentAnswers = isAddPhase ? addAnswers : answers;
+  const currIdx = isAddPhase ? addCurrentIndex : currentIndex;
+
+  labels.forEach((label, idx) => {
     const btn = document.createElement('button');
     btn.className = 'option-btn';
     btn.textContent = label;
     btn.onclick = () => selectOption(idx);
-    // 回显之前的选择
-    if (answers[currentIndex] && answers[currentIndex].score === optionScores[idx]) {
-      btn.classList.add('selected');
-    }
+    if (currentAnswers[currIdx] && currentAnswers[currIdx].score === scores[idx]) btn.classList.add('selected');
     optionsDiv.appendChild(btn);
   });
 }
 
 function selectOption(optIdx) {
-  const q = shuffled[currentIndex];
-  answers[currentIndex] = { c: q.c, score: optionScores[optIdx] };
-  currentIndex++;
-  if (currentIndex < shuffled.length) {
-    showQuestion();
+  const q = isAddPhase ? addShuffled[addCurrentIndex] : shuffled[currentIndex];
+  const labels = isAddPhase ? optionLabels.slice(0, 4) : optionLabels;
+  const scores = isAddPhase ? optionScores.slice(0, 4) : optionScores;
+  
+  if (isAddPhase) {
+    addAnswers[addCurrentIndex] = { c: q.c, score: scores[optIdx] };
+    addCurrentIndex++;
+    if (addCurrentIndex < addShuffled.length) showQuestion();
+    else showResult();
   } else {
-    showResult();
+    answers[currentIndex] = { c: q.c, score: scores[optIdx] };
+    if (optIdx === 5) uncertainCounts[q.c]++;
+    currentIndex++;
+    if (currentIndex < shuffled.length) showQuestion();
+    else checkAddTest();
   }
 }
 
 function prevQuestion() {
-  if (currentIndex > 0) {
-    currentIndex--;
-    showQuestion();
+  if (isAddPhase) { if (addCurrentIndex > 0) { addCurrentIndex--; showQuestion(); } }
+  else { if (currentIndex > 0) { currentIndex--; showQuestion(); } }
+}
+
+function checkAddTest() {
+  triggeredCategories = categories.filter(c => uncertainCounts[c] >= 5);
+  if (triggeredCategories.length > 0) {
+    document.getElementById('quiz').style.display = 'none';
+    document.getElementById('addPrompt').style.display = 'block';
+    const catText = triggeredCategories.map(c => `${c}天赋`).join('、');
+    document.getElementById('addPromptText').innerHTML = `我们在 <b>${catText}</b> 的题目中发现你多次选择了“不确定”。<br><br>为了更准确地分析你的天赋优势，建议你回答一些更细化的补充题目。是否继续？`;
+  } else {
+    showResult();
   }
 }
 
 function showResult() {
   document.getElementById('quiz').style.display = 'none';
   document.getElementById('result').style.display = 'block';
-  const totals = {};
-  categories.forEach(c => totals[c] = 0);
   
-  answers.forEach(a => { if(a) totals[a.c] += a.score; });
+  const totals = {}; const counts = {};
+  categories.forEach(c => { totals[c] = 0; counts[c] = 0; });
   
+  answers.forEach(a => { if(a) { totals[a.c] += a.score; counts[a.c] += 1; } });
+  if (isAddPhase || addAnswers.length > 0) {
+    addAnswers.forEach(a => { if(a) { totals[a.c] += a.score; counts[a.c] += 1; } });
+  }
+
   const results = categories.map(c => {
-    const total = totals[c];
-    const percent = Math.round(total / 75 * 100);
-    return { c, total, percent };
+    const max = counts[c] * 5;
+    const percent = max > 0 ? Math.round(totals[c] / max * 100) : 0;
+    return { c, total: totals[c], count: counts[c], percent };
   });
   results.sort((a,b) => b.percent - a.percent);
+
   const scoresDiv = document.getElementById('scores');
   scoresDiv.innerHTML = '';
   results.forEach(r => {
@@ -271,17 +221,59 @@ function showResult() {
     div.className = 'score-item';
     div.innerHTML = `<div class="score-label">${r.c}天赋</div>
       <div class="score-bar"><div class="score-fill" style="width:${r.percent}%"></div></div>
-      <div class="score-text">${r.percent}% (${r.total}/75)</div>`;
+      <div class="score-text">${r.percent}% (得分：${r.total} / 满分：${r.count * 5})</div>`;
     scoresDiv.appendChild(div);
   });
-  const top3 = results.slice(0,3);
+
+  const top3 = results.slice(0, 3);
   const top3Div = document.getElementById('top3');
-  top3Div.innerHTML = `<h2>你的优势天赋</h2>
-    <p>1. ${top3[0].c}天赋 ${top3[0].percent}%</p>
-    <p>2. ${top3[1].c}天赋 ${top3[1].percent}%</p>
-    <p>3. ${top3[2].c}天赋 ${top3[2].percent}%</p>
-    <p class="note">说明：本测试结果仅供参考，你的突出优势是前几项天赋。</p>`;
-}
-</script>
-</body>
-</html>
+  let reportHTML = `<h2>📊 你的天赋优势分析</h2>`;
+  top3.forEach((r, idx) => {
+    const level = r.percent >= 80 ? 'high' : (r.percent >= 50 ? 'mid' : 'low');
+    const profileText = {
+      high: {
+        "语言": "你是天生的表达者。文字和语言是你思考的载体，你善于将复杂的想法转化为清晰易懂的语句。你对词汇的敏感度高，别人也乐于听你说话或阅读你写的东西。你习惯用语言来建立联系、解决问题。这种能力让你在需要沟通和说服的场合游刃有余。",
+        "逻辑": "你具有极强的理性思维。面对复杂局面，你能迅速找到事物的因果链条和内在规律。你习惯用数据和证据说话，喜欢将大问题拆解成小步骤逐一击破。你做事条理分明，善于规划，并能敏锐地发现逻辑漏洞。这种思维模式让你在决策和分析上往往更加精准。",
+        "空间": "你拥有出色的视觉空间智能。你能在脑海中构建并操作三维图像，对色彩、线条和空间关系极其敏感。方向感好，擅于看图或画图，往往能通过视觉画面来加深记忆。在解决具象问题时，你习惯先在脑子里“看”一遍再动手。这种能力让你在设计和空间布局上极具天赋。",
+        "动觉": "你是典型的行动派和动手达人。你的身体协调性极佳，学习新动作或操作工具时上手极快。你倾向于通过“做”来学习，而不是纯靠听或看。你有很好的肌肉记忆和操作节奏感，习惯用肢体语言来辅助表达。这种务实的风格让你在实践中往往能迅速掌握要领。",
+        "音乐": "你的听觉敏锐度非常高。你很容易被旋律打动，并能分辨出声音的细微差别。节奏感是你生活中不可缺失的一部分，你常常会不自觉地哼唱或打拍子。音乐能影响你的情绪，也能帮你集中注意力。这种对声音的敏感，让你在听觉学习和艺术感知上有独特的优势。",
+        "人际": "你是天生的社交润滑剂。你拥有强大的同理心，能快速觉察他人的情绪变化和潜台词。你善于倾听，也懂得如何有效回应，因此别人愿意信任你并向你倾诉。在团队中，你常扮演协调者或气氛调动者的角色，能够轻松化解冲突。人际交往对你来说不仅是能力，更是能量的来源。",
+        "内省": "你拥有深刻的内在世界。你非常清楚自己的情绪、动机和价值观，习惯在做决定前反复思量。你享受独处的时间，并常常通过自我反思来获得成长。你不太容易受外界评价的左右，有自己坚定的判断标准。这种自知之明让你在人生选择上往往更加清醒和笃定。",
+        "自然": "你对大自然有着极强的观察力和亲和力。你总能注意到身边环境里的细微变化，比如植物的长势、天气的走向。你喜欢在户外活动，并且对物种分类和生态保护充满兴趣。你善于发现自然界中的规律和差异。这种与自然的连接，让你在观察和感知上拥有独特的视角。"
+      },
+      mid: {
+        "语言": "你具备一定的语言表达能力。在需要的时候，你能够清晰地表达自己的观点。你偶尔会注意到别人用词的精妙之处，也愿意通过文字去记录生活。虽然你不一定总爱长篇大论，但你的表达通常能够被他人理解和接受。阅读和写作是你获取信息的重要方式之一。",
+        "逻辑": "你有不错的逻辑思维基础。在处理日常事务时，你习惯于进行简单的推理和规划，也能发现一些明显的逻辑问题。你并非时刻追求理性的极致，但在关键决策前，你通常能够理智地分析利弊。你对数字和规律有一定的敏感度，但有时也会依赖直觉。",
+        "空间": "你的空间感知能力处于中等水平。你能够看懂地图，也能在脑中想象简单的立体结构，但对于复杂的三维空间问题，你可能需要借助实物才能更好理解。你对颜色和形状有一定的审美，会在意物品的摆放是否顺眼。你有时会用图示来辅助自己理解问题。",
+        "动觉": "你具备一定的动手能力和身体灵活性。你能胜任大部分日常的体力活动和手工操作，模仿动作也基本能跟上。你有时会喜欢边做边学，但并非绝对依赖这种方式。你能够保持一定的身体协调性，但可能不会主动寻求高强度的运动或精细的手工操作。",
+        "音乐": "你对音乐有一定的感知力。你能感受到旋律的情绪，并能记住一些熟悉的曲子。你偶尔会跟着音乐哼唱或打拍子，但可能不会专门去分析音乐的结构或细节。环境中的声音对你有些影响，但通常不会引起你强烈的情绪波动。音乐是你放松的一种方式。",
+        "人际": "你具备良好的人际交往能力。你能够和大多数人友好相处，也能理解别人的基本情绪。在团队中，你通常是一个友善的成员，愿意配合他人。你虽然不一定是那个最活跃的焦点人物，但别人遇到困难时，你通常会给予关心和帮助。社交对你来说是一种正常的生活需要。",
+        "内省": "你对自己有一定的了解。你知道自己的大致喜好和部分优缺点，偶尔也会反思自己的言行。你能够察觉到自己的情绪变化，但可能不会过度深究背后的原因。你喜欢适度的独立空间，但也不排斥热闹。在做决定时，你会考虑自己的感受，但也会参考他人的意见。",
+        "自然": "你对自然环境有一定的兴趣。你会欣赏美丽的风景，也会注意到天气和季节的明显变化。你并不排斥户外活动，但可能不会花大量时间专门去观察动植物。你具备基本的环保意识，知道要爱护环境。与自然接触通常是让你感到放松的一种调剂方式。"
+      },
+      low: {
+        "语言": "你的语言表达倾向较弱。你通常更习惯用其他方式（如行动、图像或逻辑）来沟通和思考。你可能不喜欢长篇大论，或者在公开场合表达想法时会感到一丝拘谨。你的词汇量也许集中在特定领域，对于不熟悉的话题，你更倾向于倾听而不是发言。这并不代表你不聪明，只是你的思维载体不是文字。",
+        "逻辑": "你倾向于用直觉、经验或情感来做判断，而不是严格的逻辑推演。你可能会觉得复杂的数字和规则有些枯燥，也不太习惯把问题拆解得过于细碎。在面对复杂局面时，你更相信自己的整体感受。你不太喜欢那些充满条条框框的环境，往往更喜欢灵活变通。",
+        "空间": "你的空间想象力相对偏弱。你在陌生的地方可能会容易失去方向感，或者在解读地图、图纸时感到有些吃力。你可能不太容易在脑海中主动构建三维画面，也不太在意物品的微观摆放。你更倾向于使用文字或声音来理解世界，而不是视觉图像。",
+        "动觉": "你更喜欢静态的思考方式，而不是通过动手操作来学习。你可能不太喜欢剧烈的运动，也不太擅长模仿复杂的动作或精细的手工活。长时间的体力活动可能会让你感到疲惫，你更愿意用脑力来解决问题。在需要身体协调和操作实物的场合，你可能会觉得有些挑战。",
+        "音乐": "你对声音和旋律的敏感度相对较低。你可能不太在意环境中的背景音乐，也不太容易分辨出音准或节奏的细微差异。音乐对你来说通常不是生活的必需品，你可能很难准确哼唱一段完整的旋律。你更依赖视觉或文字信息，听觉更多是功能性的，而非艺术性的。",
+        "人际": "你更倾向于独立完成任务，而不是在人群中寻找能量。你可能不太容易第一时间察觉到别人的情绪波动，也不太喜欢复杂的社交应酬。在团队中，你更喜欢做好自己份内的事，而不一定愿意成为协调者。你更看重深度的一对一交流，而不是广泛的人际网络。",
+        "内省": "你是一个更向外看的人。你可能不太习惯花时间去深究自己的内心世界，也不太喜欢反复琢磨自己的情绪和动机。你做决定时，可能更多依赖外部环境或他人的建议，而不是坚定的内在标准。你倾向于用行动和外部反馈来定义自己，而非内省。",
+        "自然": "你更习惯生活在人工环境中。你可能不太会主动去观察路边的植物或天气的细微变化，也不太喜欢野外探险或饲养动植物。自然对你来说可能更多是背景，而不是需要投入精力去关注的对象。你更关注与人造事物、社会规则或科技相关的内容。"
+      }
+    };
+    let jobText = "";
+    if (r.c === "语言") jobText = "基于你的优势，你非常适合从事：文案策划、记者、编辑、教师、律师、市场营销、公关、自媒体创作者、翻译等工作。";
+    else if (r.c === "逻辑") jobText = "基于你的优势，你非常适合从事：数据分析师、软件工程师、财务审计、战略咨询、科研人员、产品经理、金融分析师等工作。";
+    else if (r.c === "空间") jobText = "基于你的优势，你非常适合从事：建筑设计师、室内设计、平面设计、UI/UX设计、摄影师、飞行员、外科医生、城市规划师等工作。";
+    else if (r.c === "动觉") jobText = "基于你的优势，你非常适合从事：运动员、健身教练、外科医生、手工艺人、舞蹈演员、消防员、机械工程师、厨师等工作。";
+    else if (r.c === "音乐") jobText = "基于你的优势，你非常适合从事：音乐制作人、歌手、乐器演奏家、播音主持、声音设计师、音乐教师、录音师等工作。";
+    else if (r.c === "人际") jobText = "基于你的优势，你非常适合从事：心理咨询师、人力资源、销售总监、公关经理、教师、护士、社会工作、团队管理者等工作。";
+    else if (r.c === "内省") jobText = "基于你的优势，你非常适合从事：作家、哲学家、心理咨询师、职业规划师、研究员、创业者、独立设计师等工作。";
+    else if (r.c === "自然") jobText = "基于你的优势，你非常适合从事：生物学家、环境工程师、农业专家、兽医、地质学家、自然摄影师、园林设计师等工作。";
+
+    let adviceText = "";
+    if (level === 'high') adviceText = "你的这项天赋非常突出，建议你在生活和工作中多寻找能发挥这项优势的场景，这会让你获得极大的成就感和满足感。";
+    else if (level === 'mid') adviceText = "你的这项天赋处于中等水平，建议在需要时可以有意识地运用它，同时结合其他更突出的天赋，形成组合优势。";
+    else adviceText = "这项天赋相对偏弱，无需焦虑。你可以尝试在遇到相关问题时，借助工具、团队或刻意练习来弥补，而不必强求自己变
+    
