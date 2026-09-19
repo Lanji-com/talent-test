@@ -12,10 +12,11 @@ h1 { font-size: 22px; text-align: center; margin: 20px 0; }
 p { line-height: 1.6; }
 button { display: block; width: 100%; padding: 14px; margin: 10px 0; font-size: 16px; border: none; border-radius: 10px; background: #4a90d9; color: #fff; cursor: pointer; }
 button:active { background: #357abd; }
-.progress { text-align: center; color: #666; margin-bottom: 20px; font-size: 14px; }
-.question { font-size: 18px; font-weight: 500; margin: 30px 0; min-height: 80px; line-height: 1.5; }
+.progress { text-align: center; color: #666; margin-bottom: 10px; font-size: 14px; }
+.question { font-size: 18px; font-weight: 500; margin: 20px 0; min-height: 80px; line-height: 1.5; }
 .option-btn { background: #fff; color: #333; border: 1px solid #ddd; margin: 8px 0; text-align: left; padding: 14px; }
 .option-btn:active { background: #e8f0fe; border-color: #4a90d9; }
+.option-btn.selected { background: #e8f0fe; border-color: #4a90d9; font-weight: bold; }
 .score-item { margin: 15px 0; }
 .score-label { font-size: 14px; margin-bottom: 4px; }
 .score-bar { height: 12px; background: #e0e0e0; border-radius: 6px; overflow: hidden; }
@@ -24,6 +25,8 @@ button:active { background: #357abd; }
 #top3 { margin-top: 30px; padding: 15px; background: #fff; border-radius: 10px; }
 #top3 h2 { font-size: 18px; margin-top: 0; }
 .note { font-size: 12px; color: #999; margin-top: 15px; }
+.prev-btn { background: #fff; color: #666; border: 1px solid #ccc; margin-top: 20px; font-size: 14px; }
+.prev-btn:active { background: #f0f0f0; }
 </style>
 </head>
 <body>
@@ -38,6 +41,7 @@ button:active { background: #357abd; }
     <div class="progress">第 <span id="currentNum">1</span> / 120 题</div>
     <div class="question" id="questionText"></div>
     <div class="options" id="options"></div>
+    <button class="prev-btn" id="prevBtn" onclick="prevQuestion()" style="display:none;">← 返回上一题</button>
   </div>
   <div id="result" class="page" style="display:none;">
     <h1>你的测试结果</h1>
@@ -194,7 +198,7 @@ function shuffle(arr) {
 function startTest() {
   shuffled = shuffle([...questions]);
   currentIndex = 0;
-  answers = [];
+  answers = new Array(shuffled.length);
   document.getElementById('start').style.display = 'none';
   document.getElementById('quiz').style.display = 'block';
   showQuestion();
@@ -204,6 +208,15 @@ function showQuestion() {
   const q = shuffled[currentIndex];
   document.getElementById('currentNum').textContent = currentIndex + 1;
   document.getElementById('questionText').textContent = q.t;
+  
+  // 控制“上一题”按钮的显示
+  const prevBtn = document.getElementById('prevBtn');
+  if (currentIndex > 0) {
+    prevBtn.style.display = 'block';
+  } else {
+    prevBtn.style.display = 'none';
+  }
+
   const optionsDiv = document.getElementById('options');
   optionsDiv.innerHTML = '';
   optionLabels.forEach((label, idx) => {
@@ -211,13 +224,17 @@ function showQuestion() {
     btn.className = 'option-btn';
     btn.textContent = label;
     btn.onclick = () => selectOption(idx);
+    // 回显之前的选择
+    if (answers[currentIndex] && answers[currentIndex].score === optionScores[idx]) {
+      btn.classList.add('selected');
+    }
     optionsDiv.appendChild(btn);
   });
 }
 
 function selectOption(optIdx) {
   const q = shuffled[currentIndex];
-  answers.push({ c: q.c, score: optionScores[optIdx] });
+  answers[currentIndex] = { c: q.c, score: optionScores[optIdx] };
   currentIndex++;
   if (currentIndex < shuffled.length) {
     showQuestion();
@@ -226,12 +243,21 @@ function selectOption(optIdx) {
   }
 }
 
+function prevQuestion() {
+  if (currentIndex > 0) {
+    currentIndex--;
+    showQuestion();
+  }
+}
+
 function showResult() {
   document.getElementById('quiz').style.display = 'none';
   document.getElementById('result').style.display = 'block';
   const totals = {};
   categories.forEach(c => totals[c] = 0);
-  answers.forEach(a => { totals[a.c] += a.score; });
+  
+  answers.forEach(a => { if(a) totals[a.c] += a.score; });
+  
   const results = categories.map(c => {
     const total = totals[c];
     const percent = Math.round(total / 75 * 100);
