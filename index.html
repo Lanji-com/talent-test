@@ -98,7 +98,7 @@ function startTest() {
   showQuestion();
 }
 function startAddTest() {
-  triggeredCategories = categories.filter(c => uncertainCounts[c] >= 5);
+  triggeredCategories = categories.filter(c => uncertainCounts[c] >= 3);
   addShuffled = [];
   triggeredCategories.forEach(c => {
     addQuestions[c].forEach(q => { addShuffled.push({t: q.t, c: c}); });
@@ -157,7 +157,7 @@ function prevQuestion() {
   else { if (currentIndex > 0) { currentIndex--; showQuestion(); } }
 }
 function checkAddTest() {
-  triggeredCategories = categories.filter(c => uncertainCounts[c] >= 5);
+  triggeredCategories = categories.filter(c => uncertainCounts[c] >= 3);
   if (triggeredCategories.length > 0) {
     document.getElementById('quiz').style.display = 'none';
     document.getElementById('addPrompt').style.display = 'block';
