@@ -68,21 +68,13 @@ const optionScores = [5,4,3,2,1,0];
 const categories = ["语言","逻辑","空间","动觉","音乐","人际","内省","自然"];
 
 const questions = [
-  // 语言 (15)
   {t:"听完一件事后，我能比较完整地转述给别人。",c:"语言"},{t:"别人说话时，我会留意他们用词是否准确。",c:"语言"},{t:"看到有趣的句子，我会想记下来或发给别人。",c:"语言"},{t:"我常能用几句话把复杂的事说明白。",c:"语言"},{t:"我会因为一段文字写得好而反复读。",c:"语言"},{t:"玩词语接龙、猜谜这类活动时，我通常比较投入。",c:"语言"},{t:"别人讲错一个词或一句话，我容易听出来。",c:"语言"},{t:"我有时会在心里替别人组织更好的说法。",c:"语言"},{t:"看电影或电视剧时，我会记住一些台词。",c:"语言"},{t:"如果要表达一个想法，我更习惯用文字而不是图。",c:"语言"},{t:"我讲故事时，别人通常愿意听下去。",c:"语言"},{t:"学习新东西时，我容易记住其中的名称和说法。",c:"语言"},{t:"我会注意广告、标题或口号是怎么写的。",c:"语言"},{t:"和别人讨论时，我能较快抓住对方话里的重点。",c:"语言"},{t:"我常会想：这句话换一种说法会不会更好。",c:"语言"},
-  // 逻辑 (15)
   {t:"遇到排队、打折或分东西时，我会很快算出大概结果。",c:"逻辑"},{t:"看到一串数字或步骤，我会不自觉想找其中的规律。",c:"逻辑"},{t:"做决定前，我习惯先列出条件和可能结果。",c:"逻辑"},{t:"别人说一件事时，我会想它前后是否说得通。",c:"逻辑"},{t:"玩需要策略的游戏时，我会提前想好几步。",c:"逻辑"},{t:"我常会估算时间，判断一件事来不来得及。",c:"逻辑"},{t:"如果两个说法互相矛盾，我比较容易察觉。",c:"逻辑"},{t:"整理东西时，我喜欢按一定规则分类。",c:"逻辑"},{t:"看到图表或数据，我会想知道它说明了什么。",c:"逻辑"},{t:"遇到复杂问题，我会把它拆成几个小问题。",c:"逻辑"},{t:"我常会想“如果这样，那接下来会怎样”。",c:"逻辑"},{t:"我对规则、顺序、步骤比较在意。",c:"逻辑"},{t:"别人给出结论时，我会想有没有证据支持。",c:"逻辑"},{t:"我有时会为了验证一个想法去做小尝试。",c:"逻辑"},{t:"我容易记住一些数字、顺序或操作流程。",c:"逻辑"},
-  // 空间 (15)
   {t:"去一个新地方后，我能在脑子里大致画出路线。",c:"空间"},{t:"搬动家具前，我会先想象摆好后的样子。",c:"空间"},{t:"看说明书组装东西时，我容易看懂图上的结构。",c:"空间"},{t:"我常注意到别人衣服、房间或页面的颜色搭配。",c:"空间"},{t:"我能根据平面图想象出实际空间的样子。",c:"空间"},{t:"拍照时，我会在意角度和构图。",c:"空间"},{t:"找路时，我常靠地标和方向，而不是只靠文字提示。",c:"空间"},{t:"我有时会在脑中旋转一个物体，想象它从另一面看是什么样。",c:"空间"},{t:"整理笔记时，我喜欢用线条、箭头或框图。",c:"空间"},{t:"看地图时，我比较容易分清位置关系。",c:"空间"},{t:"我能记住看过图片或场景中的许多细节。",c:"空间"},{t:"做手工或拼装时，我容易判断零件该放哪里。",c:"空间"},{t:"我常会用画面来帮助自己理解一件事。",c:"空间"},{t:"房间或桌面的摆放不合适，我会觉得别扭。",c:"空间"},{t:"我能在心里比较两个形状是否一样。",c:"空间"},
-  // 动觉 (15)
   {t:"学一个新动作时，我通常跟着做几遍就能掌握。",c:"动觉"},{t:"我做事时喜欢边动手边想，而不是只看别人做。",c:"动觉"},{t:"别人示范动作时，我容易模仿得比较像。",c:"动觉"},{t:"长时间坐着不动，我会觉得难受。",c:"动觉"},{t:"我用手操作工具、材料时比较有把握。",c:"动觉"},{t:"走路或上下楼梯时，我很少磕碰。",c:"动觉"},{t:"我常能通过表情和动作让别人明白我的意思。",c:"动觉"},{t:"玩需要身体反应的活动时，我通常跟得上。",c:"动觉"},{t:"遇到需要拆开、组装或修理的东西，我愿意试试。",c:"动觉"},{t:"我对物体的轻重、软硬、温度比较敏感。",c:"动觉"},{t:"我学骑车、游泳或类似技能时，通常上手较快。",c:"动觉"},{t:"我有时会不自觉用动作帮助自己表达。",c:"动觉"},{t:"在集体活动中，我能较快配合别人的动作。",c:"动觉"},{t:"我喜欢通过实际做一遍来记住步骤。",c:"动觉"},{t:"我能记住并重现一段连续动作。",c:"动觉"},
-  // 音乐 (15)
   {t:"听过几遍的旋律，我常能哼出来。",c:"音乐"},{t:"周围有节奏的声音时，我会不自觉跟着打拍子。",c:"音乐"},{t:"我能听出别人唱歌有没有跑调。",c:"音乐"},{t:"做事时，有声音或音乐陪伴我会更投入。",c:"音乐"},{t:"我能分辨出不同声音的来源或特点。",c:"音乐"},{t:"一段音乐容易让我联想到某种情绪或画面。",c:"音乐"},{t:"我常会记住广告、视频或游戏里的旋律。",c:"音乐"},{t:"学一首新歌时，我通常比背文字更快。",c:"音乐"},{t:"我对环境里的杂音、节奏比较敏感。",c:"音乐"},{t:"说话或朗读时，我会注意语调起伏。",c:"音乐"},{t:"我有时会自己改动熟悉的歌词或旋律。",c:"音乐"},{t:"听到喜欢的节奏，我身体会自然有反应。",c:"音乐"},{t:"我能听出同一首歌不同版本的变化。",c:"音乐"},{t:"我容易记住别人说话的语气和节奏。",c:"音乐"},{t:"安静时，我脑中有时会浮现某段旋律。",c:"音乐"},
-  // 人际 (15)
   {t:"进入一个新群体时，我通常能较快和人熟起来。",c:"人际"},{t:"别人心情不好时，我常能较早察觉。",c:"人际"},{t:"我常会成为别人愿意倾诉的对象。",c:"人际"},{t:"在小组里，我容易注意到谁被忽略了。",c:"人际"},{t:"和别人意见不合时，我常能找到折中的说法。",c:"人际"},{t:"我能根据对方反应调整自己说话的方式。",c:"人际"},{t:"我常能猜出别人话里没直接说出的意思。",c:"人际"},{t:"集体活动时，我比较愿意协调大家的安排。",c:"人际"},{t:"别人向我求助时，我通常知道怎么回应。",c:"人际"},{t:"我容易记住别人说过的重要事情。",c:"人际"},{t:"在陌生场合，我通常不会太长时间觉得不自在。",c:"人际"},{t:"我常能感觉到一个群体的气氛变化。",c:"人际"},{t:"我有时会主动让场面不那么尴尬。",c:"人际"},{t:"我比较能理解别人为什么那样想。",c:"人际"},{t:"朋友之间发生矛盾时，我常被拉去评理或调解。",c:"人际"},
-  // 内省 (15)
   {t:"做完重要决定后，我会想自己为什么这样选。",c:"内省"},{t:"我比较清楚自己在什么状态下效率高。",c:"内省"},{t:"我常会回顾自己说过的话是否合适。",c:"内省"},{t:"遇到挫折时，我会先想自己哪里可以调整。",c:"内省"},{t:"我喜欢有一些独处的时间。",c:"内省"},{t:"我常会给自己定一些目标，并默默推进。",c:"内省"},{t:"我能较早察觉自己情绪不对劲。",c:"内省"},{t:"我知道自己真正在意什么。",c:"内省"},{t:"别人夸我或批评我时，我会想是否符合自己。",c:"内省"},{t:"我有时会写下来或记下自己的想法。",c:"内省"},{t:"做选择时，我不太容易被别人完全带偏。",c:"内省"},{t:"我常会想“这到底是不是我想要的”。",c:"内省"},{t:"我能分辨自己是真喜欢，还是只是跟风。",c:"内省"},{t:"我做事前会考虑自己的底线和原则。",c:"内省"},{t:"我有时会停下来整理自己的心情。",c:"内省"},
-  // 自然 (15)
   {t:"走路时，我会注意到路边植物的变化。",c:"自然"},{t:"我能发现天气、光线或季节的细小变化。",c:"自然"},{t:"看到不认识的动植物，我会想知道它叫什么。",c:"自然"},{t:"我常能注意到别人忽略的环境细节。",c:"自然"},{t:"我喜欢观察云、风、水或星空的形态。",c:"自然"},{t:"我容易分辨出不同植物或动物的特征。",c:"自然"},{t:"我会关心食物从哪里来、干不干净。",c:"自然"},{t:"在户外时，我常会觉得放松和投入。",c:"自然"},{t:"我喜欢把看到的东西按类别整理。",c:"自然"},{t:"我会注意一个地方的环境是否被破坏。",c:"自然"},{t:"看到小动物或昆虫，我常会停下来看一会儿。",c:"自然"},{t:"我能根据一些迹象判断天气会不会变。",c:"自然"},{t:"我喜欢看关于自然、动物或宇宙的内容。",c:"自然"},{t:"我有时会记录或拍下自然中的发现。",c:"自然"},{t:"我常会想某些自然现象是怎么形成的。",c:"自然"}
 ];
 
@@ -106,7 +98,7 @@ function shuffle(arr) { for (let i = arr.length - 1; i > 0; i--) { const j = Mat
 function startTest() {
   shuffled = shuffle([...questions]);
   currentIndex = 0; answers = new Array(shuffled.length);
-  uncertainCounts = {}; categories.forEach(c => uncertainCounts[c] = 0);
+  uncertainCounts = {}; categories.forEach(c => { uncertainCounts[c] = 0; });
   isAddPhase = false;
   document.getElementById('start').style.display = 'none';
   document.getElementById('quiz').style.display = 'block';
@@ -138,17 +130,14 @@ function showQuestion() {
   const q = isAddPhase ? addShuffled[addCurrentIndex] : shuffled[currentIndex];
   document.getElementById('currentNum').textContent = isAddPhase ? addCurrentIndex + 1 : currentIndex + 1;
   document.getElementById('questionText').textContent = q.t;
-  
   const prevBtn = document.getElementById('prevBtn');
   prevBtn.style.display = (isAddPhase ? addCurrentIndex : currentIndex) > 0 ? 'block' : 'none';
-  
   const optionsDiv = document.getElementById('options');
   optionsDiv.innerHTML = '';
   const labels = isAddPhase ? optionLabels.slice(0, 4) : optionLabels;
   const scores = isAddPhase ? optionScores.slice(0, 4) : optionScores;
   const currentAnswers = isAddPhase ? addAnswers : answers;
   const currIdx = isAddPhase ? addCurrentIndex : currentIndex;
-
   labels.forEach((label, idx) => {
     const btn = document.createElement('button');
     btn.className = 'option-btn';
@@ -162,7 +151,6 @@ function showQuestion() {
 function selectOption(optIdx) {
   const q = isAddPhase ? addShuffled[addCurrentIndex] : shuffled[currentIndex];
   const scores = isAddPhase ? optionScores.slice(0, 4) : optionScores;
-  
   if (isAddPhase) {
     addAnswers[addCurrentIndex] = { c: q.c, score: scores[optIdx] };
     addCurrentIndex++;
@@ -197,33 +185,26 @@ function checkAddTest() {
 function showResult() {
   document.getElementById('quiz').style.display = 'none';
   document.getElementById('result').style.display = 'block';
-  
   const totals = {}; const counts = {};
   categories.forEach(c => { totals[c] = 0; counts[c] = 0; });
-  
   answers.forEach(a => { if(a) { totals[a.c] += a.score; counts[a.c] += 1; } });
   if (isAddPhase || addAnswers.length > 0) {
     addAnswers.forEach(a => { if(a) { totals[a.c] += a.score; counts[a.c] += 1; } });
   }
-
   const results = categories.map(c => {
     const max = counts[c] * 5;
     const percent = max > 0 ? Math.round(totals[c] / max * 100) : 0;
     return { c, total: totals[c], count: counts[c], percent };
   });
   results.sort((a,b) => b.percent - a.percent);
-
   const scoresDiv = document.getElementById('scores');
   scoresDiv.innerHTML = '';
   results.forEach(r => {
     const div = document.createElement('div');
     div.className = 'score-item';
-    div.innerHTML = `<div class="score-label">${r.c}天赋</div>
-      <div class="score-bar"><div class="score-fill" style="width:${r.percent}%"></div></div>
-      <div class="score-text">${r.percent}% (得分：${r.total} / 满分：${r.count * 5})</div>`;
+    div.innerHTML = `<div class="score-label">${r.c}天赋</div><div class="score-bar"><div class="score-fill" style="width:${r.percent}%"></div></div><div class="score-text">${r.percent}% (得分：${r.total} / 满分：${r.count * 5})</div>`;
     scoresDiv.appendChild(div);
   });
-
   const top3 = results.slice(0, 3);
   const top3Div = document.getElementById('top3');
   let reportHTML = `<h2>📊 你的天赋优势分析</h2>`;
@@ -270,11 +251,10 @@ function showResult() {
     else if (r.c === "人际") jobText = "基于你的优势，你非常适合从事：心理咨询师、人力资源、销售总监、公关经理、教师、护士、社会工作、团队管理者等工作。";
     else if (r.c === "内省") jobText = "基于你的优势，你非常适合从事：作家、哲学家、心理咨询师、职业规划师、研究员、创业者、独立设计师等工作。";
     else if (r.c === "自然") jobText = "基于你的优势，你非常适合从事：生物学家、环境工程师、农业专家、兽医、地质学家、自然摄影师、园林设计师等工作。";
-
     let adviceText = "";
     if (level === 'high') adviceText = "你的这项天赋非常突出，建议你在生活和工作中多寻找能发挥这项优势的场景，这会让你获得极大的成就感和满足感。";
     else if (level === 'mid') adviceText = "你的这项天赋处于中等水平，建议在需要时可以有意识地运用它，同时结合其他更突出的天赋，形成组合优势。";
     else adviceText = "这项天赋相对偏弱，无需焦虑。你可以尝试在遇到相关问题时，借助工具、团队或刻意练习来弥补，而不必强求自己变成这方面的高手。";
-
-    reportHTML += `<div class="report-box">
-      <h3>🏆 第 ${idx + 1} 名：${r.c}天赋（${r.percent}%）</h
+    reportHTML += `<div class="report-box"><h3>🏆 第 ${idx + 1} 名：${r.c}天赋（${r.percent}%）</h3><p><b>【天赋画像】</b>${profileText[level][r.c]}</p><p><b>【适合工作】</b>${jobText}${adviceText}</p></div>`;
+  });
+  reportHTML += `<p style="font-siz
